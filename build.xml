@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="alfresco-opencmis-extension" default="zip" basedir=".">
+	<property name="release" value="0.1" />
+	
+	<property name="source.path" value="${basedir}/source/java" />
+	<property name="lib.path" value="${basedir}/lib" /> <!-- This folder must contain the Apache Chemistry OpenCMIS client libraries. -->
+	<property name="build.path" value="${basedir}/build" />
+	<property name="classes.path" value="${build.path}/classes" />
+	<property name="jar" value="alfresco-opencmis-extension-${release}.jar" />
+	<property name="zip" value="alfresco-opencmis-extension-${release}.zip" />
+
+	<path id="classpath.ref">
+		<fileset dir="${lib.path}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<target name="build">
+		<delete dir="${classes.path}"/>
+		<mkdir dir="${classes.path}"/>
+		<javac destdir="${classes.path}" classpathref="classpath.ref" srcdir="${source.path}" />
+	</target>
+
+	<target name="jar" depends="build">
+		<jar destfile="${basedir}/${jar}" basedir="${build.path}/classes">
+			<metainf dir="${basedir}">
+				<include name="README" />
+				<include name="LICENSE" />
+			</metainf>
+		</jar>
+	</target>
+
+	<target name="zip" depends="jar">
+		<zip destfile="${basedir}/${zip}">
+			<zipfileset dir="${basedir}" includes="${jar}" prefix=""/>
+			<zipfileset dir="${source.path}" includes="**/*.java" prefix="source"/>
+			<zipfileset dir="${basedir}" includes="README" prefix=""/>
+			<zipfileset dir="${basedir}" includes="LICENSE" prefix=""/>
+			<zipfileset dir="${basedir}" includes="build.xml" prefix=""/>
+		</zip>
+	</target>
+</project>
