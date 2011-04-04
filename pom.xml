@@ -64,6 +64,14 @@
         </mailingList>
     </mailingLists>
 
+    <distributionManagement>
+        <repository>
+            <id>maven.alfresco.com</id>
+            <name>Alfresco Maven Repository</name>
+            <url>http://maven.alfresco.com/nexus/content/repositories/releases</url>
+        </repository>
+    </distributionManagement>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compile.source>1.5</maven.compile.source>
