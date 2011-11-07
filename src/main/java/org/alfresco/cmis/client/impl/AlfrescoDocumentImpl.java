@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
+import org.alfresco.cmis.client.AlfrescoDocumentType;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.OperationContext;
@@ -31,148 +32,171 @@ import org.apache.chemistry.opencmis.commons.data.Ace;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 
-public class AlfrescoDocumentImpl extends DocumentImpl implements AlfrescoDocument
-{
-    private static final long serialVersionUID = 1L;
+public class AlfrescoDocumentImpl extends DocumentImpl implements
+		AlfrescoDocument {
+	private static final long serialVersionUID = 1L;
 
-    protected AlfrescoAspectsImpl aspects;
+	protected AlfrescoAspectsImpl aspects;
 
-    public AlfrescoDocumentImpl(SessionImpl session, ObjectType objectType, ObjectData objectData,
-            OperationContext context)
-    {
-        super(session, objectType, objectData, context);
-    }
+	public AlfrescoDocumentImpl(SessionImpl session, ObjectType objectType,
+			ObjectData objectData, OperationContext context) {
+		super(session, objectType, objectData, context);
+	}
 
-    @Override
-    protected void initialize(SessionImpl session, ObjectType objectType, ObjectData objectData,
-            OperationContext context)
-    {
-        super.initialize(session, objectType, objectData, context);
-        aspects = new AlfrescoAspectsImpl(session, this);
-    }
+	@Override
+	protected void initialize(SessionImpl session, ObjectType objectType,
+			ObjectData objectData, OperationContext context) {
+		super.initialize(session, objectType, objectData, context);
+		aspects = new AlfrescoAspectsImpl(session, this);
+	}
 
-    @Override
-    protected TransientCmisObject createTransientCmisObject()
-    {
-        TransientAlfrescoDocumentImpl td = new TransientAlfrescoDocumentImpl();
-        td.initialize(getSession(), this);
+	@Override
+	protected TransientCmisObject createTransientCmisObject() {
+		TransientAlfrescoDocumentImpl td = new TransientAlfrescoDocumentImpl();
+		td.initialize(getSession(), this);
 
-        return td;
-    }
+		return td;
+	}
 
-    @Override
-    public ObjectId updateProperties(Map<String, ?> properties, boolean refresh)
-    {
-        return super.updateProperties(
-                AlfrescoAspectsUtils.preparePropertiesForUpdate(properties, getType(), getAspects()), refresh);
-    }
+	public AlfrescoDocumentType getTypeWithAspects() {
+		readLock();
+		try {
+            return new AlfrescoDocumentTypeImpl(this);
+		} finally {
+			readUnlock();
+		}
+	}
 
-    @Override
-    public ObjectId checkIn(boolean major, Map<String, ?> properties, ContentStream contentStream,
-            String checkinComment, List<Policy> policies, List<Ace> addAces, List<Ace> removeAces)
-    {
-        return super.checkIn(major,
-                AlfrescoAspectsUtils.preparePropertiesForUpdate(properties, getType(), getAspects()), contentStream,
-                checkinComment, policies, addAces, addAces);
-    }
+	@Override
+	public ObjectId updateProperties(Map<String, ?> properties, boolean refresh) {
+		return super.updateProperties(
+				AlfrescoAspectsUtils.preparePropertiesForUpdate(properties,
+						getType(), getAspects()), refresh);
+	}
 
-    public boolean hasAspect(String id)
-    {
-        readLock();
-        try
-        {
-            return aspects.hasAspect(id);
-        } finally
-        {
-            readUnlock();
-        }
-    }
+	@Override
+	public ObjectId checkIn(boolean major, Map<String, ?> properties,
+			ContentStream contentStream, String checkinComment,
+			List<Policy> policies, List<Ace> addAces, List<Ace> removeAces) {
+		return super.checkIn(major,
+				AlfrescoAspectsUtils.preparePropertiesForUpdate(properties,
+						getType(), getAspects()), contentStream,
+				checkinComment, policies, addAces, addAces);
+	}
 
-    public boolean hasAspect(ObjectType type)
-    {
-        readLock();
-        try
-        {
-            return aspects.hasAspect(type);
-        } finally
-        {
-            readUnlock();
-        }
-    }
+	public boolean hasAspect(String id) {
+		readLock();
+		try {
+			return aspects.hasAspect(id);
+		} finally {
+			readUnlock();
+		}
+	}
 
-    public Collection<ObjectType> getAspects()
-    {
-        readLock();
-        try
-        {
-            return aspects.getAspects();
-        } finally
-        {
-            readUnlock();
-        }
-    }
+	public boolean hasAspect(ObjectType type) {
+		readLock();
+		try {
+			return aspects.hasAspect(type);
+		} finally {
+			readUnlock();
+		}
+	}
 
-    public ObjectType findAspect(String propertyId)
-    {
-        readLock();
-        try
-        {
-            return aspects.findAspect(propertyId);
-        } finally
-        {
-            readUnlock();
-        }
-    }
+	public Collection<ObjectType> getAspects() {
+		readLock();
+		try {
+			return aspects.getAspects();
+		} finally {
+			readUnlock();
+		}
+	}
 
-    public void addAspect(String... id)
-    {
-        readLock();
-        try
-        {
-            aspects.addAspect(id);
-        } finally
-        {
-            readUnlock();
-        }
-        refresh();
-    }
+	public ObjectType findAspect(String propertyId) {
+		readLock();
+		try {
+			return aspects.findAspect(propertyId);
+		} finally {
+			readUnlock();
+		}
+	}
 
-    public void addAspect(ObjectType... type)
-    {
-        readLock();
-        try
-        {
-            aspects.addAspect(type);
-        } finally
-        {
-            readUnlock();
-        }
-        refresh();
-    }
+	public void addAspect(String... id) {
+		readLock();
+		try {
+			aspects.addAspect(id);
+		} finally {
+			readUnlock();
+		}
+		refresh();
+	}
 
-    public void removeAspect(String... id)
-    {
-        readLock();
-        try
-        {
-            aspects.removeAspect(id);
-        } finally
-        {
-            readUnlock();
-        }
-        refresh();
-    }
+	public void addAspect(ObjectType... type) {
+		readLock();
+		try {
+			aspects.addAspect(type);
+		} finally {
+			readUnlock();
+		}
+		refresh();
+	}
 
-    public void removeAspect(ObjectType... type)
-    {
-        readLock();
-        try
-        {
-            aspects.removeAspect(type);
-        } finally
-        {
-            readUnlock();
-        }
-        refresh();
-    }
+	public void addAspect(ObjectType type, Map<String, ?> properties) {
+		readLock();
+		try {
+			aspects.addAspect(type, properties);
+		} finally {
+			readUnlock();
+		}
+		refresh();
+	}
+
+	public void addAspect(ObjectType[] type, Map<String, ?> properties) {
+		readLock();
+		try {
+			aspects.addAspect(type, properties);
+		} finally {
+			readUnlock();
+		}
+		refresh();
+	}
+
+	public void addAspect(String id, Map<String, ?> properties) {
+		readLock();
+		try {
+			aspects.addAspect(id, properties);
+		} finally {
+			readUnlock();
+		}
+		refresh();
+	}
+
+	public void addAspect(String[] id, Map<String, ?> properties) {
+		readLock();
+		try {
+			aspects.addAspect(id, properties);
+		} finally {
+			readUnlock();
+		}
+		refresh();
+	}
+
+	public void removeAspect(String... id) {
+		readLock();
+		try {
+			aspects.removeAspect(id);
+		} finally {
+			readUnlock();
+		}
+		refresh();
+	}
+
+	public void removeAspect(ObjectType... type) {
+		readLock();
+		try {
+			aspects.removeAspect(type);
+		} finally {
+			readUnlock();
+		}
+		refresh();
+	}
 }

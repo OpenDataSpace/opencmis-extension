@@ -56,6 +56,18 @@ public class AlfrescoFolderImpl extends FolderImpl implements AlfrescoFolder
         return td;
     }
 
+    public ObjectType getTypeWithAspects()
+    {
+        readLock();
+        try
+        {
+            return aspects.getTypeWithAspects();
+        } finally
+        {
+            readUnlock();
+        }
+    }
+
     @Override
     public ObjectId updateProperties(Map<String, ?> properties, boolean refresh)
     {
@@ -137,6 +149,58 @@ public class AlfrescoFolderImpl extends FolderImpl implements AlfrescoFolder
         refresh();
     }
 
+    public void addAspect(ObjectType type, Map<String, ?> properties)
+    {
+        readLock();
+        try
+        {
+            aspects.addAspect(type, properties);
+        } finally
+        {
+            readUnlock();
+        }
+        refresh();
+    }
+
+    public void addAspect(ObjectType[] type, Map<String, ?> properties)
+    {
+        readLock();
+        try
+        {
+            aspects.addAspect(type, properties);
+        } finally
+        {
+            readUnlock();
+        }
+        refresh();
+    }
+
+    public void addAspect(String id, Map<String, ?> properties)
+    {
+        readLock();
+        try
+        {
+            aspects.addAspect(id, properties);
+        } finally
+        {
+            readUnlock();
+        }
+        refresh();
+    }
+
+    public void addAspect(String[] id, Map<String, ?> properties)
+    {
+        readLock();
+        try
+        {
+            aspects.addAspect(id, properties);
+        } finally
+        {
+            readUnlock();
+        }
+        refresh();
+    }
+
     public void removeAspect(String... id)
     {
         readLock();
@@ -162,5 +226,4 @@ public class AlfrescoFolderImpl extends FolderImpl implements AlfrescoFolder
         }
         refresh();
     }
-
 }

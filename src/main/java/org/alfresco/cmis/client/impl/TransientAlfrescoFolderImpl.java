@@ -18,6 +18,7 @@ package org.alfresco.cmis.client.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.cmis.client.AlfrescoAspects;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
@@ -40,6 +41,11 @@ public class TransientAlfrescoFolderImpl extends TransientFolderImpl implements 
     {
         super.initialize(session, object);
         aspects = new TransientAlfrescoAspectsImpl(session, object);
+    }
+
+    public ObjectType getTypeWithAspects()
+    {
+        return aspects.getTypeWithAspects();
     }
 
     @SuppressWarnings("unchecked")
@@ -107,6 +113,30 @@ public class TransientAlfrescoFolderImpl extends TransientFolderImpl implements 
     public void removeAspect(String... id)
     {
         aspects.removeAspect(id);
+    }
+
+    public void addAspect(ObjectType type, Map<String, ?> properties)
+    {
+        aspects.addAspect(type);
+        aspects.setPropertyValues(this, properties);
+    }
+
+    public void addAspect(ObjectType[] type, Map<String, ?> properties)
+    {
+        aspects.addAspect(type);
+        aspects.setPropertyValues(this, properties);
+    }
+
+    public void addAspect(String id, Map<String, ?> properties)
+    {
+        aspects.addAspect(id);
+        aspects.setPropertyValues(this, properties);
+    }
+
+    public void addAspect(String[] id, Map<String, ?> properties)
+    {
+        aspects.addAspect(id);
+        aspects.setPropertyValues(this, properties);
     }
 
     public void removeAspect(ObjectType... type)

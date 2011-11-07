@@ -55,7 +55,7 @@ public class CMISClientTest extends TestCase
         parameter.put(SessionParameter.PASSWORD, "admin");
 
         // connection settings
-        parameter.put(SessionParameter.ATOMPUB_URL, "http://localhost:8080/alfresco/service/cmis");
+        parameter.put(SessionParameter.ATOMPUB_URL, "http://localhost:8080/alfresco/cmisatom");
         parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
         parameter.put(SessionParameter.OBJECT_FACTORY_CLASS, "org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl");
 
@@ -84,7 +84,7 @@ public class CMISClientTest extends TestCase
 
         assertTrue(alfDoc.hasAspect("P:cm:titled"));
         assertFalse(alfDoc.hasAspect("P:cm:taggable"));
-        assertEquals(1, alfDoc.getAspects().size());
+        assertTrue(alfDoc.getAspects().size() > 0);
 
         ObjectType titledAspectType = alfDoc.findAspect("cm:description");
         assertNotNull(titledAspectType);
@@ -103,20 +103,24 @@ public class CMISClientTest extends TestCase
         assertEquals(descriptionValue2, descriptionProperty.getFirstValue());
 
         // add aspect
+        int aspectCount = alfDoc.getAspects().size();
         alfDoc.addAspect("P:cm:taggable");
 
         assertTrue(alfDoc.hasAspect("P:cm:titled"));
         assertTrue(alfDoc.hasAspect(session.getTypeDefinition("P:cm:titled")));
         assertTrue(alfDoc.hasAspect("P:cm:taggable"));
         assertTrue(alfDoc.hasAspect(session.getTypeDefinition("P:cm:taggable")));
-        assertEquals(2, alfDoc.getAspects().size());
+        assertEquals(aspectCount + 1, alfDoc.getAspects().size());
+
+        ObjectType alfType = alfDoc.getTypeWithAspects();
+        assertNotNull(alfType.getPropertyDefinitions().get("cm:description"));
 
         // remove aspect
         alfDoc.removeAspect("P:cm:titled");
 
         assertFalse(alfDoc.hasAspect("P:cm:titled"));
         assertTrue(alfDoc.hasAspect("P:cm:taggable"));
-        assertEquals(1, alfDoc.getAspects().size());
+        assertEquals(aspectCount, alfDoc.getAspects().size());
 
         assertNull(doc.getProperty("cm:description"));
 
@@ -131,6 +135,37 @@ public class CMISClientTest extends TestCase
 
         assertFalse(alfDoc.hasAspect(titledAspectType));
         assertNull(doc.getProperty("cm:description"));
+
+        // delete
+        alfDoc.delete(true);
+    }
+
+    public void testAddAspectWithProperties()
+    {
+        String descriptionValue1 = "Beschreibung";
+
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put(PropertyIds.NAME, "test1");
+        properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
+
+        Document doc = session.getRootFolder().createDocument(properties, null, null);
+
+        assertTrue(doc instanceof AlfrescoDocument);
+        AlfrescoDocument alfDoc = (AlfrescoDocument) doc;
+
+        // add aspect
+        Map<String, Object> aspectProperties = new HashMap<String, Object>();
+        aspectProperties.put("cm:description", descriptionValue1);
+
+        alfDoc.addAspect("P:cm:titled", aspectProperties);
+
+        assertTrue(alfDoc.hasAspect("P:cm:titled"));
+        assertEquals(descriptionValue1, alfDoc.getPropertyValue("cm:description"));
+
+        // remove aspect
+        alfDoc.removeAspect("P:cm:titled");
+
+        assertFalse(alfDoc.hasAspect("P:cm:titled"));
 
         // delete
         alfDoc.delete(true);
@@ -249,11 +284,11 @@ public class CMISClientTest extends TestCase
         List<String> tags = new ArrayList<String>();
         tags.add("workspace://SpacesStore/a807b10e-6dea-403f-88f1-33e2383890dd");
         tags.add("workspace://SpacesStore/a728d30f-0bbe-48cf-9557-2d6b7cb63b45");
-        
+
         properties = new HashMap<String, Object>();
         properties.put("cm:taggable", tags);
         doc.updateProperties(properties);
-        
+
         // delete
         doc.delete(true);
     }

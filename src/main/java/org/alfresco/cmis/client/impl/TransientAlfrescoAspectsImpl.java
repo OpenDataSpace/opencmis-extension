@@ -25,158 +25,173 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.cmis.client.AlfrescoAspects;
+import org.alfresco.cmis.client.AlfrescoDocument;
+import org.alfresco.cmis.client.AlfrescoFolder;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.client.api.TransientCmisObject;
 import org.apache.chemistry.opencmis.commons.data.CmisExtensionElement;
 import org.apache.chemistry.opencmis.commons.enums.ExtensionLevel;
 
-public class TransientAlfrescoAspectsImpl implements AlfrescoAspects
-{
-    private Session session;
-    private CmisObject object;
-    private Map<String, ObjectType> aspectTypes;
-    private Map<String, ObjectType> addAspectTypes;
-    private Map<String, ObjectType> removeAspectTypes;
+public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
+	private Session session;
+	private CmisObject object;
+	private Map<String, ObjectType> aspectTypes;
+	private Map<String, ObjectType> addAspectTypes;
+	private Map<String, ObjectType> removeAspectTypes;
 
-    public TransientAlfrescoAspectsImpl(Session session, CmisObject object)
-    {
-        this.session = session;
-        this.object = object;
+	public TransientAlfrescoAspectsImpl(Session session, CmisObject object) {
+		this.session = session;
+		this.object = object;
 
-        List<CmisExtensionElement> alfrescoExtensions = AlfrescoAspectsUtils.findAlfrescoExtensions(object
-                .getExtensions(ExtensionLevel.PROPERTIES));
+		List<CmisExtensionElement> alfrescoExtensions = AlfrescoAspectsUtils
+				.findAlfrescoExtensions(object
+						.getExtensions(ExtensionLevel.PROPERTIES));
 
-        if (alfrescoExtensions == null)
-        {
-            aspectTypes = Collections.emptyMap();
-        } else
-        {
-            aspectTypes = new HashMap<String, ObjectType>();
-            for (ObjectType type : AlfrescoAspectsUtils.getAspectTypes(session, alfrescoExtensions))
-            {
-                if (type != null)
-                {
-                    aspectTypes.put(type.getId(), type);
-                }
-            }
-        }
+		if (alfrescoExtensions == null) {
+			aspectTypes = Collections.emptyMap();
+		} else {
+			aspectTypes = new HashMap<String, ObjectType>();
+			for (ObjectType type : AlfrescoAspectsUtils.getAspectTypes(session,
+					alfrescoExtensions)) {
+				if (type != null) {
+					aspectTypes.put(type.getId(), type);
+				}
+			}
+		}
 
-        addAspectTypes = new HashMap<String, ObjectType>();
-        removeAspectTypes = new HashMap<String, ObjectType>();
-    }
+		addAspectTypes = new HashMap<String, ObjectType>();
+		removeAspectTypes = new HashMap<String, ObjectType>();
+	}
 
-    public boolean hasAspect(String id)
-    {
-        return (aspectTypes.containsKey(id) || addAspectTypes.containsKey(id)) && (!removeAspectTypes.containsKey(id));
-    }
+    public ObjectType getTypeWithAspects() {
+		if (object instanceof AlfrescoDocument) {
+			return new AlfrescoDocumentTypeImpl((AlfrescoDocument) object);
+		} else if (object instanceof AlfrescoFolder) {
+			return new AlfrescoFolderTypeImpl((AlfrescoFolder) object);
+		} else {
+			return object.getType();
+		}
+	}
 
-    public boolean hasAspect(ObjectType type)
-    {
-        return type == null ? false : hasAspect(type.getId());
-    }
+	public boolean hasAspect(String id) {
+		return (aspectTypes.containsKey(id) || addAspectTypes.containsKey(id))
+				&& (!removeAspectTypes.containsKey(id));
+	}
 
-    public Collection<ObjectType> getAspects()
-    {
-        Collection<ObjectType> result = new ArrayList<ObjectType>();
-        Set<String> addTypes = new HashSet<String>(addAspectTypes.keySet());
+	public boolean hasAspect(ObjectType type) {
+		return type == null ? false : hasAspect(type.getId());
+	}
 
-        for (String typeId : aspectTypes.keySet())
-        {
-            if (!removeAspectTypes.containsKey(typeId))
-            {
-                result.add(aspectTypes.get(typeId));
-            }
-            addTypes.remove(typeId);
-        }
+	public Collection<ObjectType> getAspects() {
+		Collection<ObjectType> result = new ArrayList<ObjectType>();
+		Set<String> addTypes = new HashSet<String>(addAspectTypes.keySet());
 
-        for (String typeId : addTypes)
-        {
-            result.add(addAspectTypes.get(typeId));
-        }
+		for (String typeId : aspectTypes.keySet()) {
+			if (!removeAspectTypes.containsKey(typeId)) {
+				result.add(aspectTypes.get(typeId));
+			}
+			addTypes.remove(typeId);
+		}
 
-        return result;
-    }
+		for (String typeId : addTypes) {
+			result.add(addAspectTypes.get(typeId));
+		}
 
-    public ObjectType findAspect(String propertyId)
-    {
-        return AlfrescoAspectsUtils.findAspect(getAspects(), propertyId);
-    }
+		return result;
+	}
 
-    public void addAspect(String... id)
-    {
-        if (id == null || id.length == 0)
-        {
-            throw new IllegalArgumentException("Id must be set!");
-        }
+	public ObjectType findAspect(String propertyId) {
+		return AlfrescoAspectsUtils.findAspect(getAspects(), propertyId);
+	}
 
-        ObjectType[] types = new ObjectType[id.length];
-        for (int i = 0; i < id.length; i++)
-        {
-            types[i] = session.getTypeDefinition(id[i]);
-        }
+	public void addAspect(String... id) {
+		if (id == null || id.length == 0) {
+			throw new IllegalArgumentException("Id must be set!");
+		}
 
-        addAspect(types);
-    }
+		ObjectType[] types = new ObjectType[id.length];
+		for (int i = 0; i < id.length; i++) {
+			types[i] = session.getTypeDefinition(id[i]);
+		}
 
-    public void addAspect(ObjectType... type)
-    {
-        if (type == null || type.length == 0)
-        {
-            throw new IllegalArgumentException("Type must be set!");
-        }
+		addAspect(types);
+	}
 
-        for (ObjectType t : type)
-        {
-            if (t != null)
-            {
-                addAspectTypes.put(t.getId(), t);
-                removeAspectTypes.remove(t.getId());
-            }
-        }
-    }
+	public void addAspect(ObjectType... type) {
+		if (type == null || type.length == 0) {
+			throw new IllegalArgumentException("Type must be set!");
+		}
 
-    public void removeAspect(String... id)
-    {
-        if (id == null || id.length == 0)
-        {
-            throw new IllegalArgumentException("Id must be set!");
-        }
+		for (ObjectType t : type) {
+			if (t != null) {
+				addAspectTypes.put(t.getId(), t);
+				removeAspectTypes.remove(t.getId());
+			}
+		}
+	}
 
-        ObjectType[] types = new ObjectType[id.length];
-        for (int i = 0; i < id.length; i++)
-        {
-            types[i] = session.getTypeDefinition(id[i]);
-        }
+	public void setPropertyValues(TransientCmisObject object,
+			Map<String, ?> properties) {
+		if (properties == null || properties.isEmpty()) {
+			return;
+		}
 
-        removeAspect(types);
-    }
+		for (Map.Entry<String, ?> property : properties.entrySet()) {
+			object.setPropertyValue(property.getKey(), property.getValue());
+		}
+	}
 
-    public void removeAspect(ObjectType... type)
-    {
-        if (type == null || type.length == 0)
-        {
-            throw new IllegalArgumentException("Type must be set!");
-        }
+	public void addAspect(ObjectType type, Map<String, ?> properties) {
+		addAspect(type);
+	}
 
-        for (ObjectType t : type)
-        {
-            if (t != null)
-            {
-                addAspectTypes.remove(t.getId());
-                removeAspectTypes.put(t.getId(), t);
-            }
-        }
-    }
+	public void addAspect(ObjectType[] type, Map<String, ?> properties) {
+		addAspect(type);
+	}
 
-    public void save()
-    {
-        if (addAspectTypes.isEmpty() && removeAspectTypes.isEmpty())
-        {
-            return;
-        }
+	public void addAspect(String id, Map<String, ?> properties) {
+		addAspect(id);
+	}
 
-        AlfrescoAspectsUtils.updateAspects(session, object.getId(), addAspectTypes.values().toArray(new ObjectType[0]),
-                removeAspectTypes.values().toArray(new ObjectType[0]));
-    }
+	public void addAspect(String[] id, Map<String, ?> properties) {
+		addAspect(id);
+	}
+
+	public void removeAspect(String... id) {
+		if (id == null || id.length == 0) {
+			throw new IllegalArgumentException("Id must be set!");
+		}
+
+		ObjectType[] types = new ObjectType[id.length];
+		for (int i = 0; i < id.length; i++) {
+			types[i] = session.getTypeDefinition(id[i]);
+		}
+
+		removeAspect(types);
+	}
+
+	public void removeAspect(ObjectType... type) {
+		if (type == null || type.length == 0) {
+			throw new IllegalArgumentException("Type must be set!");
+		}
+
+		for (ObjectType t : type) {
+			if (t != null) {
+				addAspectTypes.remove(t.getId());
+				removeAspectTypes.put(t.getId(), t);
+			}
+		}
+	}
+
+	public void save() {
+		if (addAspectTypes.isEmpty() && removeAspectTypes.isEmpty()) {
+			return;
+		}
+
+		AlfrescoAspectsUtils.updateAspects(session, object.getId(),
+				addAspectTypes.values().toArray(new ObjectType[0]),
+				removeAspectTypes.values().toArray(new ObjectType[0]), null);
+	}
 }

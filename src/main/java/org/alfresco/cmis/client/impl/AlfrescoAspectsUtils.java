@@ -232,7 +232,7 @@ public class AlfrescoAspectsUtils
             return df.newXMLGregorianCalendar((GregorianCalendar) value).toXMLFormat();
         } else if (!(value instanceof String) && !(value instanceof Number) && !(value instanceof Boolean))
         {
-            throw new IllegalArgumentException("Invalid ascpect value!");
+            throw new IllegalArgumentException("Invalid aspect value!");
         }
 
         return value.toString();
@@ -354,20 +354,27 @@ public class AlfrescoAspectsUtils
      * Adds and removes aspects.
      */
     public static void updateAspects(Session session, String objectId, ObjectType[] addAspectIds,
-            ObjectType[] removeAspectIds)
+            ObjectType[] removeAspectIds, Map<String, ?> properties)
     {
         String repId = session.getRepositoryInfo().getId();
         Holder<String> objectIdHolder = new Holder<String>(objectId);
+        Map<String, PropertyDefinition<?>> aspectPropertyDefinition = null;
 
         List<CmisExtensionElement> alfrescoExtensionList = new ArrayList<CmisExtensionElement>();
 
         if (addAspectIds != null)
         {
+            aspectPropertyDefinition = new HashMap<String, PropertyDefinition<?>>();
             for (ObjectType type : addAspectIds)
             {
                 if (type != null)
                 {
                     alfrescoExtensionList.add(AlfrescoAspectsUtils.createAspectsToAddExtension(type));
+
+                    if (type.getPropertyDefinitions() != null)
+                    {
+                        aspectPropertyDefinition.putAll(type.getPropertyDefinitions());
+                    }
                 }
             }
         }
@@ -388,10 +395,37 @@ public class AlfrescoAspectsUtils
             return;
         }
 
-        Properties properties = new PropertiesImpl();
-        properties.setExtensions(Collections.singletonList(AlfrescoAspectsUtils
+        // add property values
+        if (addAspectIds != null && properties != null && !properties.isEmpty())
+        {
+            List<CmisExtensionElement> aspectProperties = new ArrayList<CmisExtensionElement>(properties.size());
+
+            for (Map.Entry<String, ?> property : properties.entrySet())
+            {
+                if ((property == null) || (property.getKey() == null))
+                {
+                    continue;
+                }
+
+                String id = property.getKey();
+                Object value = property.getValue();
+
+                if (!aspectPropertyDefinition.containsKey(id))
+                {
+                    throw new IllegalArgumentException("Property '" + id + "' is not an aspect property!");
+                }
+
+                aspectProperties.add(createAspectPropertyExtension(aspectPropertyDefinition.get(id), value));
+            }
+
+            alfrescoExtensionList.add(AlfrescoAspectsUtils.createAspectPropertiesExtension(aspectProperties));
+        }
+
+        // create properties object
+        Properties cmisProperties = new PropertiesImpl();
+        cmisProperties.setExtensions(Collections.singletonList(AlfrescoAspectsUtils
                 .createSetAspectsExtension(alfrescoExtensionList)));
 
-        session.getBinding().getObjectService().updateProperties(repId, objectIdHolder, null, properties, null);
+        session.getBinding().getObjectService().updateProperties(repId, objectIdHolder, null, cmisProperties, null);
     }
 }

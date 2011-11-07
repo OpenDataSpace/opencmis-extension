@@ -16,84 +16,133 @@
 package org.alfresco.cmis.client;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 
 /**
  * Alfresco aspects interface.
  */
-public interface AlfrescoAspects
-{
-    /**
-     * Returns if the given aspect is applied to this object.
-     * 
-     * @param id
-     *            the aspect id
-     * 
-     * @return <code>true</code> if the aspect is applied, <code>false</code>
-     *         otherwise
-     */
-    boolean hasAspect(String id);
+public interface AlfrescoAspects {
 
-    /**
-     * Returns if the given aspect is applied to this object.
-     * 
-     * @param type
-     *            the aspect object type
-     * 
-     * @return <code>true</code> if the aspect is applied, <code>false</code>
-     *         otherwise
-     */
-    boolean hasAspect(ObjectType type);
+	/**
+	 * Returns a type definition with the applied aspects.
+	 * 
+	 * @return an object type with all property definitions (object and aspect
+	 *         properties).
+	 */
+	ObjectType getTypeWithAspects();
 
-    /**
-     * Returns all applied aspects. If no aspect is applied, an empty collection
-     * is returned.
-     * 
-     * @return collection of the applied aspects
-     */
-    Collection<ObjectType> getAspects();
+	/**
+	 * Returns if the given aspect is applied to this object.
+	 * 
+	 * @param id
+	 *            the aspect id
+	 * 
+	 * @return <code>true</code> if the aspect is applied, <code>false</code>
+	 *         otherwise
+	 */
+	boolean hasAspect(String id);
 
-    /**
-     * Returns the aspect type that defines the given property.
-     * 
-     * @param propertyId
-     *            the property id
-     * 
-     * @return the aspect type if the property id is defined in an applied
-     *         aspect, <code>null</code> otherwise
-     */
-    ObjectType findAspect(String propertyId);
+	/**
+	 * Returns if the given aspect is applied to this object.
+	 * 
+	 * @param type
+	 *            the aspect object type
+	 * 
+	 * @return <code>true</code> if the aspect is applied, <code>false</code>
+	 *         otherwise
+	 */
+	boolean hasAspect(ObjectType type);
 
-    /**
-     * Adds one or more aspects to the object.
-     * 
-     * @param id
-     *            the aspect id or ids
-     */
-    void addAspect(String... id);
+	/**
+	 * Returns all applied aspects. If no aspect is applied, an empty collection
+	 * is returned.
+	 * 
+	 * @return collection of the applied aspects
+	 */
+	Collection<ObjectType> getAspects();
 
-    /**
-     * Adds one or more aspects to the object.
-     * 
-     * @param id
-     *            the aspect type or types
-     */
-    void addAspect(ObjectType... type);
+	/**
+	 * Returns the aspect type that defines the given property.
+	 * 
+	 * @param propertyId
+	 *            the property id
+	 * 
+	 * @return the aspect type if the property id is defined in an applied
+	 *         aspect, <code>null</code> otherwise
+	 */
+	ObjectType findAspect(String propertyId);
 
-    /**
-     * Removes one or more aspects from the object.
-     * 
-     * @param id
-     *            the aspect id or ids
-     */
-    void removeAspect(String... id);
+	/**
+	 * Adds one or more aspects to the object.
+	 * 
+	 * @param id
+	 *            the aspect id or ids
+	 */
+	void addAspect(String... id);
 
-    /**
-     * Removes one or more aspects from the object.
-     * 
-     * @param id
-     *            the aspect type or types
-     */
-    void removeAspect(ObjectType... type);
+	/**
+	 * Adds one or more aspects to the object.
+	 * 
+	 * @param type
+	 *            the aspect type or types
+	 */
+	void addAspect(ObjectType... type);
+
+	/**
+	 * Adds an aspect and sets aspect properties.
+	 * 
+	 * @param type
+	 *            the aspect type
+	 * @param properties
+	 *            the aspect properties
+	 */
+	void addAspect(ObjectType type, Map<String, ?> properties);
+
+	/**
+	 * Adds aspects and sets aspect properties.
+	 * 
+	 * @param type
+	 *            the aspect types
+	 * @param properties
+	 *            the aspect properties
+	 */
+	void addAspect(ObjectType[] type, Map<String, ?> properties);
+
+	/**
+	 * Adds an aspect and sets aspect properties.
+	 * 
+	 * @param id
+	 *            the aspect type
+	 * @param properties
+	 *            the aspect properties
+	 */
+	void addAspect(String id, Map<String, ?> properties);
+
+	/**
+	 * Adds aspects and sets aspect properties.
+	 * 
+	 * @param id
+	 *            the aspect types
+	 * @param properties
+	 *            the aspect properties
+	 */
+	void addAspect(String[] id, Map<String, ?> properties);
+
+	/**
+	 * Removes one or more aspects from the object.
+	 * 
+	 * @param id
+	 *            the aspect id or ids
+	 */
+	void removeAspect(String... id);
+
+	/**
+	 * Removes one or more aspects from the object.
+	 * 
+	 * @param id
+	 *            the aspect type or types
+	 */
+	void removeAspect(ObjectType... type);
 }

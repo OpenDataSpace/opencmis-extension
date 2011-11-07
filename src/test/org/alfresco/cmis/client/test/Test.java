@@ -41,8 +41,31 @@ public class Test
         parameter.put(SessionParameter.PASSWORD, "admin");
 
         // connection settings
-        parameter.put(SessionParameter.ATOMPUB_URL, "http://localhost:8080/alfresco/service/cmis");
-        parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
+        // parameter.put(SessionParameter.ATOMPUB_URL,
+        // "http://localhost:8080/alfresco/cmisatom");
+        // parameter.put(SessionParameter.BINDING_TYPE,
+        // BindingType.ATOMPUB.value());
+
+        parameter.put(SessionParameter.WEBSERVICES_REPOSITORY_SERVICE,
+                "http://localhost:8080/alfresco/cmisws/RepositoryService?wsdl");
+        parameter.put(SessionParameter.WEBSERVICES_NAVIGATION_SERVICE,
+                "http://localhost:8080/alfresco/cmisws/NavigationService?wsdl");
+        parameter.put(SessionParameter.WEBSERVICES_OBJECT_SERVICE,
+                "http://localhost:8080/alfresco/cmisws/ObjectService?wsdl");
+        parameter.put(SessionParameter.WEBSERVICES_VERSIONING_SERVICE,
+                "http://localhost:8080/alfresco/cmisws/VersioningService?wsdl");
+        parameter.put(SessionParameter.WEBSERVICES_DISCOVERY_SERVICE,
+                "http://localhost:8080/alfresco/cmis/DiscoveryService?wsdl");
+        parameter.put(SessionParameter.WEBSERVICES_MULTIFILING_SERVICE,
+                "http://localhost:8080/alfresco/cmisws/MultiFilingService?wsdl");
+        parameter.put(SessionParameter.WEBSERVICES_RELATIONSHIP_SERVICE,
+                "http://localhost:8080/alfresco/cmisws/RelationshipService?wsdl");
+        parameter
+                .put(SessionParameter.WEBSERVICES_ACL_SERVICE, "http://localhost:8080/alfresco/cmisws/ACLService?wsdl");
+        parameter.put(SessionParameter.WEBSERVICES_POLICY_SERVICE,
+                "http://localhost:8080/alfresco/cmisws/PolicyService?wsdl");
+
+        parameter.put(SessionParameter.BINDING_TYPE, BindingType.WEBSERVICES.value());
         parameter.put(SessionParameter.OBJECT_FACTORY_CLASS, "org.alfresco.cmis.client.impl.AlfrescoObjectFactoryImpl");
 
         // create session
