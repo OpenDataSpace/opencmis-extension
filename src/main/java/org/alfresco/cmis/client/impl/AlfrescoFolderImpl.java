@@ -72,7 +72,7 @@ public class AlfrescoFolderImpl extends FolderImpl implements AlfrescoFolder
     public ObjectId updateProperties(Map<String, ?> properties, boolean refresh)
     {
         return super.updateProperties(
-                AlfrescoAspectsUtils.preparePropertiesForUpdate(properties, getType(), getAspects()), refresh);
+                AlfrescoUtils.preparePropertiesForUpdate(properties, getType(), getAspects()), refresh);
     }
 
     public boolean hasAspect(String id)

@@ -70,7 +70,7 @@ public class AlfrescoDocumentImpl extends DocumentImpl implements
 	@Override
 	public ObjectId updateProperties(Map<String, ?> properties, boolean refresh) {
 		return super.updateProperties(
-				AlfrescoAspectsUtils.preparePropertiesForUpdate(properties,
+				AlfrescoUtils.preparePropertiesForUpdate(properties,
 						getType(), getAspects()), refresh);
 	}
 
@@ -79,7 +79,7 @@ public class AlfrescoDocumentImpl extends DocumentImpl implements
 			ContentStream contentStream, String checkinComment,
 			List<Policy> policies, List<Ace> addAces, List<Ace> removeAces) {
 		return super.checkIn(major,
-				AlfrescoAspectsUtils.preparePropertiesForUpdate(properties,
+				AlfrescoUtils.preparePropertiesForUpdate(properties,
 						getType(), getAspects()), contentStream,
 				checkinComment, policies, addAces, addAces);
 	}

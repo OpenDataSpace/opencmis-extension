@@ -27,6 +27,10 @@ import java.util.Set;
 
 import javax.xml.datatype.DatatypeFactory;
 
+import org.alfresco.cmis.client.type.AlfrescoDocumentType;
+import org.alfresco.cmis.client.type.AlfrescoFolderType;
+import org.alfresco.cmis.client.type.AlfrescoPolicyType;
+import org.alfresco.cmis.client.type.AlfrescoRelationshipType;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.OperationContext;
@@ -40,7 +44,12 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.CmisExtensionElement;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
+import org.apache.chemistry.opencmis.commons.definitions.DocumentTypeDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.FolderTypeDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.PolicyTypeDefinition;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.RelationshipTypeDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.TypeDefinition;
 import org.apache.chemistry.opencmis.commons.enums.Updatability;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisRuntimeException;
 
@@ -57,6 +66,26 @@ public class AlfrescoObjectFactoryImpl extends ObjectFactoryImpl
     {
     }
 
+    @Override
+    public ObjectType convertTypeDefinition(TypeDefinition typeDefinition)
+    {
+    	ObjectType ret = null;
+
+        if (typeDefinition instanceof DocumentTypeDefinition) {
+        	ret = new AlfrescoDocumentType(this.session, (DocumentTypeDefinition) typeDefinition);
+        } else if (typeDefinition instanceof FolderTypeDefinition) {
+        	ret = new AlfrescoFolderType(this.session, (FolderTypeDefinition) typeDefinition);
+        } else if (typeDefinition instanceof RelationshipTypeDefinition) {
+        	ret = new AlfrescoRelationshipType(this.session, (RelationshipTypeDefinition) typeDefinition);
+        } else if (typeDefinition instanceof PolicyTypeDefinition) {
+        	ret = new AlfrescoPolicyType(this.session, (PolicyTypeDefinition) typeDefinition);
+        } else {
+            throw new CmisRuntimeException("Unknown base type!");
+        }
+
+    	return ret;
+    }
+    
     public void initialize(Session session, Map<String, String> parameters)
     {
         super.initialize(session, parameters);
@@ -164,7 +193,7 @@ public class AlfrescoObjectFactoryImpl extends ObjectFactoryImpl
         // prepare aspects
         for (ObjectType aspectType : aspectTypes)
         {
-            alfrescoExtensionList.add(AlfrescoAspectsUtils.createAspectsToAddExtension(aspectType));
+            alfrescoExtensionList.add(AlfrescoUtils.createAspectsToAddExtension(aspectType));
         }
 
         // prepare aspect properties
@@ -180,7 +209,7 @@ public class AlfrescoObjectFactoryImpl extends ObjectFactoryImpl
                     throw new IllegalArgumentException("Unknown aspect property: " + property.getKey());
                 }
 
-                CmisExtensionElement element = AlfrescoAspectsUtils.createAspectPropertyExtension(propDef,
+                CmisExtensionElement element = AlfrescoUtils.createAspectPropertyExtension(propDef,
                         property.getValue());
                 if (element != null)
                 {
@@ -188,12 +217,12 @@ public class AlfrescoObjectFactoryImpl extends ObjectFactoryImpl
                 }
             }
 
-            alfrescoExtensionList.add(AlfrescoAspectsUtils.createAspectPropertiesExtension(propertrtyExtensionList));
+            alfrescoExtensionList.add(AlfrescoUtils.createAspectPropertiesExtension(propertrtyExtensionList));
         }
 
         if (!alfrescoExtensionList.isEmpty())
         {
-            result.setExtensions(Collections.singletonList(AlfrescoAspectsUtils
+            result.setExtensions(Collections.singletonList(AlfrescoUtils
                     .createSetAspectsExtension(alfrescoExtensionList)));
         }
 
@@ -206,7 +235,7 @@ public class AlfrescoObjectFactoryImpl extends ObjectFactoryImpl
         Map<String, Property<?>> result = super.convertProperties(objectType, properties);
 
         // find the Alfresco extensions
-        List<CmisExtensionElement> alfrescoExtensions = AlfrescoAspectsUtils.findAlfrescoExtensions(properties
+        List<CmisExtensionElement> alfrescoExtensions = AlfrescoUtils.findAlfrescoExtensions(properties
                 .getExtensions());
 
         if (alfrescoExtensions == null)
@@ -216,7 +245,7 @@ public class AlfrescoObjectFactoryImpl extends ObjectFactoryImpl
         }
 
         // get the aspect types
-        Collection<ObjectType> aspectTypes = AlfrescoAspectsUtils.getAspectTypes(session, alfrescoExtensions);
+        Collection<ObjectType> aspectTypes = AlfrescoUtils.getAspectTypes(session, alfrescoExtensions);
 
         for (CmisExtensionElement extension : alfrescoExtensions)
         {
@@ -230,7 +259,7 @@ public class AlfrescoObjectFactoryImpl extends ObjectFactoryImpl
                 String id = property.getAttributes().get("propertyDefinitionId");
 
                 // find the aspect type
-                ObjectType aspectType = AlfrescoAspectsUtils.findAspect(aspectTypes, id);
+                ObjectType aspectType = AlfrescoUtils.findAspect(aspectTypes, id);
                 if (aspectType == null)
                 {
                     throw new IllegalArgumentException("Unknown aspect property: " + id);

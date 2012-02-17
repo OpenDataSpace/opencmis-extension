@@ -34,6 +34,7 @@ import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.Session;
 import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.CmisExtensionElement;
+import org.apache.chemistry.opencmis.commons.data.ExtensionsData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.Cardinality;
@@ -41,9 +42,9 @@ import org.apache.chemistry.opencmis.commons.impl.dataobjects.CmisExtensionEleme
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
 
-public class AlfrescoAspectsUtils
+public class AlfrescoUtils
 {
-    private AlfrescoAspectsUtils()
+    private AlfrescoUtils()
     {
     }
 
@@ -54,6 +55,8 @@ public class AlfrescoAspectsUtils
     public static final String ASPECTS_TO_ADD = "aspectsToAdd";
     public static final String ASPECTS_TO_REMOVE = "aspectsToRemove";
     public static final String PROPERTIES = "properties";
+    public static final String MANDATORY_ASPECTS = "mandatoryAspects";
+    public static final String MANDATORY_ASPECT = "mandatoryAspect";
 
     /**
      * Finds the Alfresco extensions within the given extensions.
@@ -369,7 +372,7 @@ public class AlfrescoAspectsUtils
             {
                 if (type != null)
                 {
-                    alfrescoExtensionList.add(AlfrescoAspectsUtils.createAspectsToAddExtension(type));
+                    alfrescoExtensionList.add(AlfrescoUtils.createAspectsToAddExtension(type));
 
                     if (type.getPropertyDefinitions() != null)
                     {
@@ -385,7 +388,7 @@ public class AlfrescoAspectsUtils
             {
                 if (type != null)
                 {
-                    alfrescoExtensionList.add(AlfrescoAspectsUtils.createAspectsToRemoveExtension(type));
+                    alfrescoExtensionList.add(AlfrescoUtils.createAspectsToRemoveExtension(type));
                 }
             }
         }
@@ -418,14 +421,52 @@ public class AlfrescoAspectsUtils
                 aspectProperties.add(createAspectPropertyExtension(aspectPropertyDefinition.get(id), value));
             }
 
-            alfrescoExtensionList.add(AlfrescoAspectsUtils.createAspectPropertiesExtension(aspectProperties));
+            alfrescoExtensionList.add(AlfrescoUtils.createAspectPropertiesExtension(aspectProperties));
         }
 
         // create properties object
         Properties cmisProperties = new PropertiesImpl();
-        cmisProperties.setExtensions(Collections.singletonList(AlfrescoAspectsUtils
+        cmisProperties.setExtensions(Collections.singletonList(AlfrescoUtils
                 .createSetAspectsExtension(alfrescoExtensionList)));
 
         session.getBinding().getObjectService().updateProperties(repId, objectIdHolder, null, cmisProperties, null);
+    }
+    
+	private static CmisExtensionElement getExtension(List<CmisExtensionElement> extensions, String namespace, String name)
+    {
+    	CmisExtensionElement ret = null;
+
+    	for(CmisExtensionElement elem : extensions)
+    	{
+    		if(elem.getNamespace().equals(namespace) && elem.getName().equals(name))
+    		{
+    			ret = elem;
+    		}
+    	}
+
+    	return ret;
+    }
+	
+    public static List<String> getMandatoryAspects(ExtensionsData object)
+    {
+		List<String> mandatoryAspects = null;
+
+		List<CmisExtensionElement> extensions = object.getExtensions();
+		CmisExtensionElement mandatoryAspectsExtension = getExtension(extensions, ALFRESCO_NAMESPACE, MANDATORY_ASPECTS);
+		if(mandatoryAspectsExtension != null)
+		{
+			List<CmisExtensionElement> mandatoryAspectsExtensions = mandatoryAspectsExtension.getChildren();
+			mandatoryAspects = new ArrayList<String>(mandatoryAspectsExtensions.size());
+			for(CmisExtensionElement elem : mandatoryAspectsExtensions)
+			{
+				mandatoryAspects.add(elem.getValue());
+			}
+		}
+		else
+		{
+			mandatoryAspects = Collections.emptyList();
+		}
+
+		return mandatoryAspects;
     }
 }

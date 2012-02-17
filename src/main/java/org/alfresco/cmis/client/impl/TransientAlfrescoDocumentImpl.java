@@ -66,7 +66,7 @@ public class TransientAlfrescoDocumentImpl extends TransientDocumentImpl
 			throw new IllegalArgumentException("Property is read-only!");
 		}
 
-		List<T> values = AlfrescoAspectsUtils.checkProperty(propertyDefinition,
+		List<T> values = AlfrescoUtils.checkProperty(propertyDefinition,
 				value);
 
 		// create and set property
@@ -146,7 +146,7 @@ public class TransientAlfrescoDocumentImpl extends TransientDocumentImpl
 		ObjectType type = getType();
 		PropertyDefinition<String> propDef = (PropertyDefinition<String>) type
 				.getPropertyDefinitions().get(PropertyIds.OBJECT_TYPE_ID);
-		String objectTypeIdValue = AlfrescoAspectsUtils
+		String objectTypeIdValue = AlfrescoUtils
 				.createObjectTypeIdValue(type, getAspects());
 		Property<String> objectTypeIdProperty = getObjectFactory()
 				.createProperty(propDef,

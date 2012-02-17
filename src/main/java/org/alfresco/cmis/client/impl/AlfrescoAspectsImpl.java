@@ -39,7 +39,7 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 		this.session = session;
 		this.object = object;
 
-		List<CmisExtensionElement> alfrescoExtensions = AlfrescoAspectsUtils
+		List<CmisExtensionElement> alfrescoExtensions = AlfrescoUtils
 				.findAlfrescoExtensions(object
 						.getExtensions(ExtensionLevel.PROPERTIES));
 
@@ -47,7 +47,7 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 			aspectTypes = Collections.emptyMap();
 		} else {
 			aspectTypes = new HashMap<String, ObjectType>();
-			for (ObjectType type : AlfrescoAspectsUtils.getAspectTypes(session,
+			for (ObjectType type : AlfrescoUtils.getAspectTypes(session,
 					alfrescoExtensions)) {
 				if (type != null) {
 					aspectTypes.put(type.getId(), type);
@@ -79,7 +79,7 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 	}
 
 	public ObjectType findAspect(String propertyId) {
-		return AlfrescoAspectsUtils
+		return AlfrescoUtils
 				.findAspect(aspectTypes.values(), propertyId);
 	}
 
@@ -101,7 +101,7 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 			throw new IllegalArgumentException("Type must be set!");
 		}
 
-		AlfrescoAspectsUtils.updateAspects(session, object.getId(), type, null,
+		AlfrescoUtils.updateAspects(session, object.getId(), type, null,
 				null);
 	}
 
@@ -114,7 +114,7 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 			throw new IllegalArgumentException("Type must be set!");
 		}
 
-		AlfrescoAspectsUtils.updateAspects(session, object.getId(), type, null,
+		AlfrescoUtils.updateAspects(session, object.getId(), type, null,
 				properties);
 	}
 
@@ -153,7 +153,7 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 			throw new IllegalArgumentException("Type must be set!");
 		}
 
-		AlfrescoAspectsUtils.updateAspects(session, object.getId(), null, type,
+		AlfrescoUtils.updateAspects(session, object.getId(), null, type,
 				null);
 	}
 }

@@ -45,7 +45,7 @@ public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
 		this.session = session;
 		this.object = object;
 
-		List<CmisExtensionElement> alfrescoExtensions = AlfrescoAspectsUtils
+		List<CmisExtensionElement> alfrescoExtensions = AlfrescoUtils
 				.findAlfrescoExtensions(object
 						.getExtensions(ExtensionLevel.PROPERTIES));
 
@@ -53,7 +53,7 @@ public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
 			aspectTypes = Collections.emptyMap();
 		} else {
 			aspectTypes = new HashMap<String, ObjectType>();
-			for (ObjectType type : AlfrescoAspectsUtils.getAspectTypes(session,
+			for (ObjectType type : AlfrescoUtils.getAspectTypes(session,
 					alfrescoExtensions)) {
 				if (type != null) {
 					aspectTypes.put(type.getId(), type);
@@ -103,7 +103,7 @@ public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
 	}
 
 	public ObjectType findAspect(String propertyId) {
-		return AlfrescoAspectsUtils.findAspect(getAspects(), propertyId);
+		return AlfrescoUtils.findAspect(getAspects(), propertyId);
 	}
 
 	public void addAspect(String... id) {
@@ -190,7 +190,7 @@ public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
 			return;
 		}
 
-		AlfrescoAspectsUtils.updateAspects(session, object.getId(),
+		AlfrescoUtils.updateAspects(session, object.getId(),
 				addAspectTypes.values().toArray(new ObjectType[0]),
 				removeAspectTypes.values().toArray(new ObjectType[0]), null);
 	}
