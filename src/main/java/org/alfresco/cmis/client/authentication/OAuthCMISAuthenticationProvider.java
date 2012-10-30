@@ -34,14 +34,23 @@ import org.w3c.dom.Element;
 /**
  * An OpenCMIS OAuth authentication provider.
  * 
+ * Example connection parameters:
+ * 
+ * org.apache.chemistry.opencmis.binding.spi.type=atompub
+ * org.apache.chemistry.opencmis.binding.atompub.url=https://api.alfresco.com/cmis/versions/1.0/atom
+ * org.apache.chemistry.opencmis.binding.auth.classname=org.alfresco.cmis.client.authentication.OAuthCMISAuthenticationProvider
+ * org.apache.chemistry.opencmis.binding.auth.http.basic=false
+ * org.apache.chemistry.opencmis.binding.auth.oauth.accessToken=<access token>
+ * org.apache.chemistry.opencmis.binding.compression=true
+ *
  * @author steveglover
  *
  */
 public class OAuthCMISAuthenticationProvider extends AbstractAuthenticationProvider
 {
-	public static final int ALFRESCO_ACCESS_TOKEN_TIMEOUT = 60 * 60 * 1000;
 	public static final String ALFRESCO_ACCESS_TOKEN_URL = "https://api.alfresco.com/auth/oauth/versions/2/token";
 	public static final String ALFRESCO_REFRESH_TOKEN_URL = "https://api.alfresco.com/auth/oauth/versions/2/token";
+	public static final String PARAM_ACCESS_TOKEN = "org.apache.chemistry.opencmis.binding.auth.oauth.accessToken";
 
     private static final long serialVersionUID = 1L;
 
@@ -73,6 +82,10 @@ public class OAuthCMISAuthenticationProvider extends AbstractAuthenticationProvi
 	{
 		return new OAuthCMISAuthenticationProvider(clientId, clientSecret, redirectUrl, ALFRESCO_ACCESS_TOKEN_URL, ALFRESCO_REFRESH_TOKEN_URL, authCode);
 	}
+
+    public OAuthCMISAuthenticationProvider()
+    {
+    }
 
     /**
      * Authenticates with the Alfresco CMIS Public Api with a previously-generated access token (no refresh token support).
@@ -109,7 +122,7 @@ public class OAuthCMISAuthenticationProvider extends AbstractAuthenticationProvi
         // Create the client
         client = new HttpClient(manager);
 
-        getAccessToken();
+        generateAccessToken();
     }
     
     public AccessToken getAccessTokenData()
@@ -117,7 +130,7 @@ public class OAuthCMISAuthenticationProvider extends AbstractAuthenticationProvi
 		return accessTokenData;
 	}
 
-    private void getAccessToken()
+    private void generateAccessToken()
     {
     	PostMethod method = new PostMethod(accessTokenUrl);
     	NameValuePair[] data =
@@ -212,10 +225,25 @@ public class OAuthCMISAuthenticationProvider extends AbstractAuthenticationProvi
             cookieManager = new CmisCookieManager();
         }
     }
+    
+    private String getAccessToken()
+    {
+	    Object accessTokenObject = getSession().get(PARAM_ACCESS_TOKEN);
+	    if (accessTokenObject instanceof String) {
+	        return (String) accessTokenObject;
+	    }
+	
+	    return null;
+    }
 
     @Override
     public Map<String, List<String>> getHTTPHeaders(String url) {
         Map<String, List<String>> result = new HashMap<String, List<String>>(fixedHeaders);
+
+        if(accessToken == null)
+        {
+        	accessToken = getAccessToken();
+        }
 
         if(accessToken == null)
         {
@@ -380,7 +408,7 @@ public class OAuthCMISAuthenticationProvider extends AbstractAuthenticationProvi
     		this.accessToken = (String)json.get("access_token");
     		this.tokenType = (String)json.get("token_type");
     		Long expiresIn = (Long)json.get("expires_in");
-    		this.expiresAt = System.currentTimeMillis() + expiresIn * ALFRESCO_ACCESS_TOKEN_TIMEOUT;
+    		this.expiresAt = System.currentTimeMillis() + expiresIn * 60 * 60 * 1000;
     		this.refreshToken = (String)json.get("refresh_token");
     		this.scope = (String)json.get("scope");
     	}
@@ -391,7 +419,7 @@ public class OAuthCMISAuthenticationProvider extends AbstractAuthenticationProvi
 			this.accessToken = accessToken;
 			this.tokenType = tokenType;
 			Long expires = expiresIn;
-    		this.expiresAt = System.currentTimeMillis() + expires * ALFRESCO_ACCESS_TOKEN_TIMEOUT;
+    		this.expiresAt = System.currentTimeMillis() + expires * 60 * 60 * 1000;
 			this.refreshToken = refreshToken;
 			this.scope = scope;
 		}
