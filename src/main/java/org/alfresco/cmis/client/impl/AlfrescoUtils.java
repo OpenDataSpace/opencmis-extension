@@ -436,12 +436,15 @@ public class AlfrescoUtils
     {
     	CmisExtensionElement ret = null;
 
-    	for(CmisExtensionElement elem : extensions)
+    	if (extensions != null)
     	{
-    		if(elem.getNamespace().equals(namespace) && elem.getName().equals(name))
-    		{
-    			ret = elem;
-    		}
+    	    for(CmisExtensionElement elem : extensions)
+    	    {
+    	        if(elem.getNamespace().equals(namespace) && elem.getName().equals(name))
+    	        {
+    	            ret = elem;
+    	        }
+    	    }
     	}
 
     	return ret;
