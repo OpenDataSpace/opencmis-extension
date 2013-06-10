@@ -190,7 +190,7 @@ public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
 			return;
 		}
 
-		AlfrescoUtils.updateAspects(session, object.getId(),
+		AlfrescoUtils.updateAspects(session, object,
 				addAspectTypes.values().toArray(new ObjectType[0]),
 				removeAspectTypes.values().toArray(new ObjectType[0]), null);
 	}

@@ -27,7 +27,9 @@ import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Tree;
 import org.apache.chemistry.opencmis.commons.data.CmisExtensionElement;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.TypeMutability;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.TypeMutabilityImpl;
 
 public class AlfrescoFolderTypeImpl implements AlfrescoFolderType
 {
@@ -168,4 +170,13 @@ public class AlfrescoFolderTypeImpl implements AlfrescoFolderType
     {
         return folder.getType().getDescendants(depth);
     }
+    
+	public TypeMutability getTypeMutability()
+	{
+		TypeMutabilityImpl typeMutability = new TypeMutabilityImpl();
+		typeMutability.setCanCreate(Boolean.FALSE);
+		typeMutability.setCanDelete(Boolean.FALSE);
+		typeMutability.setCanUpdate(Boolean.FALSE);
+		return typeMutability;
+	}
 }

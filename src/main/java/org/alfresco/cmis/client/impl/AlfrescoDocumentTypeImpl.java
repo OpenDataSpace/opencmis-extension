@@ -28,8 +28,10 @@ import org.apache.chemistry.opencmis.client.api.Tree;
 import org.apache.chemistry.opencmis.commons.data.CmisExtensionElement;
 import org.apache.chemistry.opencmis.commons.definitions.DocumentTypeDefinition;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.TypeMutability;
 import org.apache.chemistry.opencmis.commons.enums.BaseTypeId;
 import org.apache.chemistry.opencmis.commons.enums.ContentStreamAllowed;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.TypeMutabilityImpl;
 
 public class AlfrescoDocumentTypeImpl implements AlfrescoDocumentType {
 	private static final long serialVersionUID = 1L;
@@ -153,5 +155,14 @@ public class AlfrescoDocumentTypeImpl implements AlfrescoDocumentType {
 
 	public List<Tree<ObjectType>> getDescendants(int depth) {
 		return doc.getType().getDescendants(depth);
+	}
+
+	public TypeMutability getTypeMutability()
+	{
+		TypeMutabilityImpl typeMutability = new TypeMutabilityImpl();
+		typeMutability.setCanCreate(Boolean.FALSE);
+		typeMutability.setCanDelete(Boolean.FALSE);
+		typeMutability.setCanUpdate(Boolean.FALSE);
+		return typeMutability;
 	}
 }

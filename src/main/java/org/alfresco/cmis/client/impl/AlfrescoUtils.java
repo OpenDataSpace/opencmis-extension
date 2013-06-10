@@ -22,13 +22,16 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
+import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.Session;
@@ -36,10 +39,13 @@ import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.CmisExtensionElement;
 import org.apache.chemistry.opencmis.commons.data.ExtensionsData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
+import org.apache.chemistry.opencmis.commons.data.PropertyData;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.Cardinality;
+import org.apache.chemistry.opencmis.commons.enums.CmisVersion;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.CmisExtensionElementImpl;
 import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertiesImpl;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.PropertyIdImpl;
 import org.apache.chemistry.opencmis.commons.spi.Holder;
 
 public class AlfrescoUtils
@@ -356,78 +362,134 @@ public class AlfrescoUtils
     /**
      * Adds and removes aspects.
      */
-    public static void updateAspects(Session session, String objectId, ObjectType[] addAspectIds,
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static void updateAspects(Session session, CmisObject object, ObjectType[] addAspectIds,
             ObjectType[] removeAspectIds, Map<String, ?> properties)
     {
+        String objectId = object.getId();
         String repId = session.getRepositoryInfo().getId();
         Holder<String> objectIdHolder = new Holder<String>(objectId);
         Map<String, PropertyDefinition<?>> aspectPropertyDefinition = null;
-
-        List<CmisExtensionElement> alfrescoExtensionList = new ArrayList<CmisExtensionElement>();
-
-        if (addAspectIds != null)
-        {
-            aspectPropertyDefinition = new HashMap<String, PropertyDefinition<?>>();
-            for (ObjectType type : addAspectIds)
-            {
-                if (type != null)
-                {
-                    alfrescoExtensionList.add(AlfrescoUtils.createAspectsToAddExtension(type));
-
-                    if (type.getPropertyDefinitions() != null)
-                    {
-                        aspectPropertyDefinition.putAll(type.getPropertyDefinitions());
-                    }
-                }
-            }
-        }
-
-        if (removeAspectIds != null)
-        {
-            for (ObjectType type : removeAspectIds)
-            {
-                if (type != null)
-                {
-                    alfrescoExtensionList.add(AlfrescoUtils.createAspectsToRemoveExtension(type));
-                }
-            }
-        }
-
-        if (alfrescoExtensionList.isEmpty())
-        {
-            return;
-        }
-
-        // add property values
-        if (addAspectIds != null && properties != null && !properties.isEmpty())
-        {
-            List<CmisExtensionElement> aspectProperties = new ArrayList<CmisExtensionElement>(properties.size());
-
-            for (Map.Entry<String, ?> property : properties.entrySet())
-            {
-                if ((property == null) || (property.getKey() == null))
-                {
-                    continue;
-                }
-
-                String id = property.getKey();
-                Object value = property.getValue();
-
-                if (!aspectPropertyDefinition.containsKey(id))
-                {
-                    throw new IllegalArgumentException("Property '" + id + "' is not an aspect property!");
-                }
-
-                aspectProperties.add(createAspectPropertyExtension(aspectPropertyDefinition.get(id), value));
-            }
-
-            alfrescoExtensionList.add(AlfrescoUtils.createAspectPropertiesExtension(aspectProperties));
-        }
-
         // create properties object
         Properties cmisProperties = new PropertiesImpl();
-        cmisProperties.setExtensions(Collections.singletonList(AlfrescoUtils
-                .createSetAspectsExtension(alfrescoExtensionList)));
+        
+        CmisVersion cmisVersion = session.getRepositoryInfo().getCmisVersion();
+
+        if(cmisVersion.equals(CmisVersion.CMIS_1_1))
+//        Property<?> secondaryTypesProp = object.getProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS);
+//        if(secondaryTypesProp != null)
+        {
+        	// cmis 1.1
+        	Property<?> secondaryTypesProp = object.getProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS);
+        	List currentSecondaryTypes = (List)secondaryTypesProp.getValue();
+        	Set<String> currentSecondaryTypesSet = new HashSet<String>(currentSecondaryTypes);
+
+	        if (addAspectIds != null)
+	        {
+	        	Set<String> addAspects = new HashSet<String>();
+	        	for(ObjectType type : addAspectIds)
+	        	{
+	        		addAspects.add(type.getId());
+	        	}
+	        	currentSecondaryTypesSet.addAll(addAspects);
+	        }
+
+	        if (removeAspectIds != null)
+	        {
+	        	Set<String> removeAspects = new HashSet<String>();
+	        	for(ObjectType type : removeAspectIds)
+	        	{
+	        		removeAspects.add(type.getId());
+	        	}
+	        	currentSecondaryTypesSet.removeAll(removeAspects);
+	        }
+	        
+	        List<String> secondaryTypesToSet = new ArrayList<String>();
+	        for(String secondaryType : currentSecondaryTypesSet)
+	        {
+	        	secondaryTypesToSet.add(secondaryType);
+	        }
+	        
+	        if(secondaryTypesToSet.isEmpty())
+	        {
+	        	// nothing to do
+	        	return;
+	        }
+
+	        Collection<PropertyData<?>> props = new ArrayList<PropertyData<?>>(1);
+	        PropertyData<?> updatedSecondaryTypesProp = new PropertyIdImpl(PropertyIds.SECONDARY_OBJECT_TYPE_IDS, secondaryTypesToSet);
+	        props.add(updatedSecondaryTypesProp);
+	        cmisProperties = new PropertiesImpl(props);
+	        session.getBinding().getObjectService().updateProperties(repId, objectIdHolder, null, cmisProperties, null);
+        }
+        else if(cmisVersion.equals(CmisVersion.CMIS_1_0))
+        {
+        	// cmis 1.0
+	        List<CmisExtensionElement> alfrescoExtensionList = new ArrayList<CmisExtensionElement>();
+	
+	        if (addAspectIds != null)
+	        {
+	            aspectPropertyDefinition = new HashMap<String, PropertyDefinition<?>>();
+	            for (ObjectType type : addAspectIds)
+	            {
+	                if (type != null)
+	                {
+	                    alfrescoExtensionList.add(AlfrescoUtils.createAspectsToAddExtension(type));
+	
+	                    if (type.getPropertyDefinitions() != null)
+	                    {
+	                        aspectPropertyDefinition.putAll(type.getPropertyDefinitions());
+	                    }
+	                }
+	            }
+	        }
+	
+	        if (removeAspectIds != null)
+	        {
+	            for (ObjectType type : removeAspectIds)
+	            {
+	                if (type != null)
+	                {
+	                    alfrescoExtensionList.add(AlfrescoUtils.createAspectsToRemoveExtension(type));
+	                }
+	            }
+	        }
+	
+	        if (alfrescoExtensionList.isEmpty())
+	        {
+	            return;
+	        }
+	
+	        // add property values
+	        if (addAspectIds != null && properties != null && !properties.isEmpty())
+	        {
+	            List<CmisExtensionElement> aspectProperties = new ArrayList<CmisExtensionElement>(properties.size());
+	
+	            for (Map.Entry<String, ?> property : properties.entrySet())
+	            {
+	                if ((property == null) || (property.getKey() == null))
+	                {
+	                    continue;
+	                }
+	
+	                String id = property.getKey();
+	                Object value = property.getValue();
+	
+	                if (!aspectPropertyDefinition.containsKey(id))
+	                {
+	                    throw new IllegalArgumentException("Property '" + id + "' is not an aspect property!");
+	                }
+	
+	                aspectProperties.add(createAspectPropertyExtension(aspectPropertyDefinition.get(id), value));
+	            }
+	
+	            alfrescoExtensionList.add(AlfrescoUtils.createAspectPropertiesExtension(aspectProperties));
+	        }
+
+	        cmisProperties = new PropertiesImpl();
+	        cmisProperties.setExtensions(Collections.singletonList(AlfrescoUtils
+	                .createSetAspectsExtension(alfrescoExtensionList)));
+        }
 
         session.getBinding().getObjectService().updateProperties(repId, objectIdHolder, null, cmisProperties, null);
     }

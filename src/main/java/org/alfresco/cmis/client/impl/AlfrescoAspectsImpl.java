@@ -26,7 +26,9 @@ import org.alfresco.cmis.client.AlfrescoDocument;
 import org.alfresco.cmis.client.AlfrescoFolder;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
+import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.commons.PropertyIds;
 import org.apache.chemistry.opencmis.commons.data.CmisExtensionElement;
 import org.apache.chemistry.opencmis.commons.enums.ExtensionLevel;
 
@@ -39,18 +41,34 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 		this.session = session;
 		this.object = object;
 
-		List<CmisExtensionElement> alfrescoExtensions = AlfrescoUtils
-				.findAlfrescoExtensions(object
-						.getExtensions(ExtensionLevel.PROPERTIES));
-
-		if (alfrescoExtensions == null) {
-			aspectTypes = Collections.emptyMap();
-		} else {
+		Property<?> secondaryTypesProp = object.getProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS);
+		if(secondaryTypesProp != null)
+		{
+			// cmis 1.1
+			List<String> secondaryTypes = secondaryTypesProp.getValue();
 			aspectTypes = new HashMap<String, ObjectType>();
-			for (ObjectType type : AlfrescoUtils.getAspectTypes(session,
-					alfrescoExtensions)) {
-				if (type != null) {
-					aspectTypes.put(type.getId(), type);
+			for(String secondaryType : secondaryTypes)
+			{
+	            ObjectType aspectType = session.getTypeDefinition(secondaryType);
+	            aspectTypes.put(aspectType.getId(), aspectType);
+			}
+		}
+		else
+		{
+			// cmis 1.0
+			List<CmisExtensionElement> alfrescoExtensions = AlfrescoUtils
+					.findAlfrescoExtensions(object
+							.getExtensions(ExtensionLevel.PROPERTIES));
+	
+			if (alfrescoExtensions == null) {
+				aspectTypes = Collections.emptyMap();
+			} else {
+				aspectTypes = new HashMap<String, ObjectType>();
+				for (ObjectType type : AlfrescoUtils.getAspectTypes(session,
+						alfrescoExtensions)) {
+					if (type != null) {
+						aspectTypes.put(type.getId(), type);
+					}
 				}
 			}
 		}
@@ -101,7 +119,7 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 			throw new IllegalArgumentException("Type must be set!");
 		}
 
-		AlfrescoUtils.updateAspects(session, object.getId(), type, null,
+		AlfrescoUtils.updateAspects(session, object, type, null,
 				null);
 	}
 
@@ -114,7 +132,7 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 			throw new IllegalArgumentException("Type must be set!");
 		}
 
-		AlfrescoUtils.updateAspects(session, object.getId(), type, null,
+		AlfrescoUtils.updateAspects(session, object, type, null,
 				properties);
 	}
 
@@ -153,7 +171,7 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 			throw new IllegalArgumentException("Type must be set!");
 		}
 
-		AlfrescoUtils.updateAspects(session, object.getId(), null, type,
+		AlfrescoUtils.updateAspects(session, object, null, type,
 				null);
 	}
 }
