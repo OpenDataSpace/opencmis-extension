@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.alfresco.cmis.client.AlfrescoDocument;
 import org.alfresco.cmis.client.AlfrescoDocumentType;
+import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.OperationContext;
@@ -120,67 +121,93 @@ public class AlfrescoDocumentImpl extends DocumentImpl implements
 		}
 	}
 
-	public void addAspect(String... id) {
+	public CmisObject addAspect(String... id) {
+		CmisObject ret = this;
+
 		readLock();
 		try {
-			aspects.addAspect(id);
+			ret = aspects.addAspect(id);
 		} finally {
 			readUnlock();
 		}
 		refresh();
+
+		return ret;
 	}
 
-	public void addAspect(ObjectType... type) {
+	public CmisObject addAspect(ObjectType... type) {
+		CmisObject ret = this;
+
 		readLock();
 		try {
-			aspects.addAspect(type);
+			ret = aspects.addAspect(type);
 		} finally {
 			readUnlock();
 		}
 		refresh();
+		
+		return ret;
 	}
 
-	public void addAspect(ObjectType type, Map<String, ?> properties) {
+	public CmisObject addAspect(ObjectType type, Map<String, ?> properties) {
+		CmisObject ret = this;
+		
 		readLock();
 		try {
-			aspects.addAspect(type, properties);
+			ret = aspects.addAspect(type, properties);
 		} finally {
 			readUnlock();
 		}
 		refresh();
+		
+		return ret;
 	}
 
-	public void addAspect(ObjectType[] type, Map<String, ?> properties) {
+	public CmisObject addAspect(ObjectType[] type, Map<String, ?> properties) {
+		CmisObject ret = this;
+
 		readLock();
 		try {
-			aspects.addAspect(type, properties);
+			ret = aspects.addAspect(type, properties);
 		} finally {
 			readUnlock();
 		}
 		refresh();
+		
+		return ret;
 	}
 
-	public void addAspect(String id, Map<String, ?> properties) {
+	public CmisObject addAspect(String id, Map<String, ?> properties) {
+		CmisObject ret = this;
+		
 		readLock();
 		try {
-			aspects.addAspect(id, properties);
+			ret = aspects.addAspect(id, properties);
 		} finally {
 			readUnlock();
 		}
 		refresh();
+		
+		return ret;
 	}
 
-	public void addAspect(String[] id, Map<String, ?> properties) {
+	public CmisObject addAspect(String[] id, Map<String, ?> properties) {
+		CmisObject ret = this;
+		
 		readLock();
 		try {
-			aspects.addAspect(id, properties);
+			ret = aspects.addAspect(id, properties);
 		} finally {
 			readUnlock();
 		}
 		refresh();
+		
+		return ret;
 	}
 
-	public void removeAspect(String... id) {
+	public CmisObject removeAspect(String... id) {
+		CmisObject ret = this;
+
 		readLock();
 		try {
 			aspects.removeAspect(id);
@@ -188,15 +215,21 @@ public class AlfrescoDocumentImpl extends DocumentImpl implements
 			readUnlock();
 		}
 		refresh();
+		
+		return ret;
 	}
 
-	public void removeAspect(ObjectType... type) {
+	public CmisObject removeAspect(ObjectType... type) {
+		CmisObject ret = this;
+
 		readLock();
 		try {
-			aspects.removeAspect(type);
+			ret = aspects.removeAspect(type);
 		} finally {
 			readUnlock();
 		}
 		refresh();
+		
+		return ret;
 	}
 }

@@ -106,7 +106,7 @@ public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
 		return AlfrescoUtils.findAspect(getAspects(), propertyId);
 	}
 
-	public void addAspect(String... id) {
+	public CmisObject addAspect(String... id) {
 		if (id == null || id.length == 0) {
 			throw new IllegalArgumentException("Id must be set!");
 		}
@@ -116,10 +116,10 @@ public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
 			types[i] = session.getTypeDefinition(id[i]);
 		}
 
-		addAspect(types);
+		return addAspect(types);
 	}
 
-	public void addAspect(ObjectType... type) {
+	public CmisObject addAspect(ObjectType... type) {
 		if (type == null || type.length == 0) {
 			throw new IllegalArgumentException("Type must be set!");
 		}
@@ -130,6 +130,8 @@ public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
 				removeAspectTypes.remove(t.getId());
 			}
 		}
+		
+		return object;
 	}
 
 	public void setPropertyValues(TransientCmisObject object,
@@ -143,23 +145,23 @@ public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
 		}
 	}
 
-	public void addAspect(ObjectType type, Map<String, ?> properties) {
-		addAspect(type);
+	public CmisObject addAspect(ObjectType type, Map<String, ?> properties) {
+		return addAspect(type);
 	}
 
-	public void addAspect(ObjectType[] type, Map<String, ?> properties) {
-		addAspect(type);
+	public CmisObject addAspect(ObjectType[] type, Map<String, ?> properties) {
+		return addAspect(type);
 	}
 
-	public void addAspect(String id, Map<String, ?> properties) {
-		addAspect(id);
+	public CmisObject addAspect(String id, Map<String, ?> properties) {
+		return addAspect(id);
 	}
 
-	public void addAspect(String[] id, Map<String, ?> properties) {
-		addAspect(id);
+	public CmisObject addAspect(String[] id, Map<String, ?> properties) {
+		return addAspect(id);
 	}
 
-	public void removeAspect(String... id) {
+	public CmisObject removeAspect(String... id) {
 		if (id == null || id.length == 0) {
 			throw new IllegalArgumentException("Id must be set!");
 		}
@@ -169,10 +171,10 @@ public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
 			types[i] = session.getTypeDefinition(id[i]);
 		}
 
-		removeAspect(types);
+		return removeAspect(types);
 	}
 
-	public void removeAspect(ObjectType... type) {
+	public CmisObject removeAspect(ObjectType... type) {
 		if (type == null || type.length == 0) {
 			throw new IllegalArgumentException("Type must be set!");
 		}
@@ -183,6 +185,7 @@ public class TransientAlfrescoAspectsImpl implements AlfrescoAspects {
 				removeAspectTypes.put(t.getId(), t);
 			}
 		}
+		return object;
 	}
 
 	public void save() {

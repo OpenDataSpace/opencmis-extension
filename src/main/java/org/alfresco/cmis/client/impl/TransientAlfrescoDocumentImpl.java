@@ -94,40 +94,44 @@ public class TransientAlfrescoDocumentImpl extends TransientDocumentImpl
 		return aspects.findAspect(propertyId);
 	}
 
-	public void addAspect(String... id) {
-		aspects.addAspect(id);
+	public CmisObject addAspect(String... id) {
+		return aspects.addAspect(id);
 	}
 
-	public void addAspect(ObjectType... type) {
-		aspects.addAspect(type);
+	public CmisObject addAspect(ObjectType... type) {
+		return aspects.addAspect(type);
 	}
 
-	public void addAspect(ObjectType type, Map<String, ?> properties) {
-		aspects.addAspect(type);
+	public CmisObject addAspect(ObjectType type, Map<String, ?> properties) {
+		CmisObject cmisObject = aspects.addAspect(type);
 		aspects.setPropertyValues(this, properties);
+		return cmisObject;
 	}
 
-	public void addAspect(ObjectType[] type, Map<String, ?> properties) {
-		aspects.addAspect(type);
+	public CmisObject addAspect(ObjectType[] type, Map<String, ?> properties) {
+		CmisObject cmisObject = aspects.addAspect(type);
 		aspects.setPropertyValues(this, properties);
+		return cmisObject;
 	}
 
-	public void addAspect(String id, Map<String, ?> properties) {
-		aspects.addAspect(id);
+	public CmisObject addAspect(String id, Map<String, ?> properties) {
+		CmisObject cmisObject = aspects.addAspect(id);
 		aspects.setPropertyValues(this, properties);
+		return cmisObject;
 	}
 
-	public void addAspect(String[] id, Map<String, ?> properties) {
-		aspects.addAspect(id);
+	public CmisObject addAspect(String[] id, Map<String, ?> properties) {
+		CmisObject cmisObject = aspects.addAspect(id);
 		aspects.setPropertyValues(this, properties);
+		return cmisObject;
 	}
 
-	public void removeAspect(String... id) {
-		aspects.removeAspect(id);
+	public CmisObject removeAspect(String... id) {
+		return aspects.removeAspect(id);
 	}
 
-	public void removeAspect(ObjectType... type) {
-		aspects.removeAspect(type);
+	public CmisObject removeAspect(ObjectType... type) {
+		return aspects.removeAspect(type);
 	}
 
 	@Override

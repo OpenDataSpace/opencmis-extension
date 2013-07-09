@@ -363,7 +363,7 @@ public class AlfrescoUtils
      * Adds and removes aspects.
      */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static void updateAspects(Session session, CmisObject object, ObjectType[] addAspectIds,
+	public static String updateAspects(Session session, CmisObject object, ObjectType[] addAspectIds,
             ObjectType[] removeAspectIds, Map<String, ?> properties)
     {
         String objectId = object.getId();
@@ -376,8 +376,6 @@ public class AlfrescoUtils
         CmisVersion cmisVersion = session.getRepositoryInfo().getCmisVersion();
 
         if(cmisVersion.equals(CmisVersion.CMIS_1_1))
-//        Property<?> secondaryTypesProp = object.getProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS);
-//        if(secondaryTypesProp != null)
         {
         	// cmis 1.1
         	Property<?> secondaryTypesProp = object.getProperty(PropertyIds.SECONDARY_OBJECT_TYPE_IDS);
@@ -413,7 +411,7 @@ public class AlfrescoUtils
 	        if(secondaryTypesToSet.isEmpty())
 	        {
 	        	// nothing to do
-	        	return;
+	        	return objectId;
 	        }
 
 	        Collection<PropertyData<?>> props = new ArrayList<PropertyData<?>>(1);
@@ -457,7 +455,7 @@ public class AlfrescoUtils
 	
 	        if (alfrescoExtensionList.isEmpty())
 	        {
-	            return;
+	            return objectId;
 	        }
 	
 	        // add property values
@@ -492,6 +490,8 @@ public class AlfrescoUtils
         }
 
         session.getBinding().getObjectService().updateProperties(repId, objectIdHolder, null, cmisProperties, null);
+
+        return objectIdHolder.getValue();
     }
     
 	private static CmisExtensionElement getExtension(List<CmisExtensionElement> extensions, String namespace, String name)

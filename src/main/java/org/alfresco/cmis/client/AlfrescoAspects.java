@@ -18,6 +18,7 @@ package org.alfresco.cmis.client;
 import java.util.Collection;
 import java.util.Map;
 
+import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 
 /**
@@ -79,16 +80,18 @@ public interface AlfrescoAspects {
 	 * 
 	 * @param id
 	 *            the aspect id or ids
+	 * @return the changed object (which may be a new object)
 	 */
-	void addAspect(String... id);
+	CmisObject addAspect(String... id);
 
 	/**
 	 * Adds one or more aspects to the object.
 	 * 
 	 * @param type
 	 *            the aspect type or types
+	 * @return the changed object (which may be a new object)
 	 */
-	void addAspect(ObjectType... type);
+	CmisObject addAspect(ObjectType... type);
 
 	/**
 	 * Adds an aspect and sets aspect properties.
@@ -97,8 +100,9 @@ public interface AlfrescoAspects {
 	 *            the aspect type
 	 * @param properties
 	 *            the aspect properties
+	 * @return the changed object (which may be a new object)
 	 */
-	void addAspect(ObjectType type, Map<String, ?> properties);
+	CmisObject addAspect(ObjectType type, Map<String, ?> properties);
 
 	/**
 	 * Adds aspects and sets aspect properties.
@@ -107,8 +111,9 @@ public interface AlfrescoAspects {
 	 *            the aspect types
 	 * @param properties
 	 *            the aspect properties
+	 * @return the changed object (which may be a new object)
 	 */
-	void addAspect(ObjectType[] type, Map<String, ?> properties);
+	CmisObject addAspect(ObjectType[] type, Map<String, ?> properties);
 
 	/**
 	 * Adds an aspect and sets aspect properties.
@@ -117,8 +122,9 @@ public interface AlfrescoAspects {
 	 *            the aspect type
 	 * @param properties
 	 *            the aspect properties
+	 * @return the changed object (which may be a new object)
 	 */
-	void addAspect(String id, Map<String, ?> properties);
+	CmisObject addAspect(String id, Map<String, ?> properties);
 
 	/**
 	 * Adds aspects and sets aspect properties.
@@ -127,22 +133,25 @@ public interface AlfrescoAspects {
 	 *            the aspect types
 	 * @param properties
 	 *            the aspect properties
+	 * @return the changed object (which may be a new object)
 	 */
-	void addAspect(String[] id, Map<String, ?> properties);
+	CmisObject addAspect(String[] id, Map<String, ?> properties);
 
 	/**
 	 * Removes one or more aspects from the object.
 	 * 
 	 * @param id
 	 *            the aspect id or ids
+	 * @return the changed object (which may be a new object)
 	 */
-	void removeAspect(String... id);
+	CmisObject removeAspect(String... id);
 
 	/**
 	 * Removes one or more aspects from the object.
 	 * 
 	 * @param id
 	 *            the aspect type or types
+	 * @return the changed object (which may be a new object)
 	 */
-	void removeAspect(ObjectType... type);
+	CmisObject removeAspect(ObjectType... type);
 }

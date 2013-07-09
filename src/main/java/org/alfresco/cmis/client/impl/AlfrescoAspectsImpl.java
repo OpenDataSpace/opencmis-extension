@@ -101,7 +101,7 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 				.findAspect(aspectTypes.values(), propertyId);
 	}
 
-	public void addAspect(String... id) {
+	public CmisObject addAspect(String... id) {
 		if (id == null || id.length == 0) {
 			throw new IllegalArgumentException("Id must be set!");
 		}
@@ -111,36 +111,48 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 			types[i] = session.getTypeDefinition(id[i]);
 		}
 
-		addAspect(types);
+		return addAspect(types);
 	}
 
-	public void addAspect(ObjectType... type) {
+	public CmisObject addAspect(ObjectType... type) {
+		CmisObject ret = object;
+
 		if (type == null || type.length == 0) {
 			throw new IllegalArgumentException("Type must be set!");
 		}
 
-		AlfrescoUtils.updateAspects(session, object, type, null,
+		String objectId = AlfrescoUtils.updateAspects(session, object, type, null,
 				null);
+        if (!object.getId().equals(objectId)) {
+            ret = session.getObject(objectId);
+        }
+		return ret;
 	}
 
-	public void addAspect(ObjectType type, Map<String, ?> properties) {
-		addAspect(new ObjectType[] { type }, properties);
+	public CmisObject addAspect(ObjectType type, Map<String, ?> properties) {
+		return addAspect(new ObjectType[] { type }, properties);
 	}
 
-	public void addAspect(ObjectType[] type, Map<String, ?> properties) {
+	public CmisObject addAspect(ObjectType[] type, Map<String, ?> properties) {
+		CmisObject ret = object;
+
 		if (type == null || type.length == 0) {
 			throw new IllegalArgumentException("Type must be set!");
 		}
 
-		AlfrescoUtils.updateAspects(session, object, type, null,
+		String objectId = AlfrescoUtils.updateAspects(session, object, type, null,
 				properties);
+        if (!object.getId().equals(objectId)) {
+            ret = session.getObject(objectId);
+        }
+		return ret;
 	}
 
-	public void addAspect(String id, Map<String, ?> properties) {
-		addAspect(new String[] { id }, properties);
+	public CmisObject addAspect(String id, Map<String, ?> properties) {
+		return addAspect(new String[] { id }, properties);
 	}
 
-	public void addAspect(String[] id, Map<String, ?> properties) {
+	public CmisObject addAspect(String[] id, Map<String, ?> properties) {
 		if (id == null || id.length == 0) {
 			throw new IllegalArgumentException("Id must be set!");
 		}
@@ -150,10 +162,10 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 			types[i] = session.getTypeDefinition(id[i]);
 		}
 
-		addAspect(types, properties);
+		return addAspect(types, properties);
 	}
 
-	public void removeAspect(String... id) {
+	public CmisObject removeAspect(String... id) {
 		if (id == null || id.length == 0) {
 			throw new IllegalArgumentException("Id must be set!");
 		}
@@ -163,15 +175,20 @@ public class AlfrescoAspectsImpl implements AlfrescoAspects {
 			types[i] = session.getTypeDefinition(id[i]);
 		}
 
-		removeAspect(types);
+		return removeAspect(types);
 	}
 
-	public void removeAspect(ObjectType... type) {
+	public CmisObject removeAspect(ObjectType... type) {
+		CmisObject ret = object;
 		if (type == null || type.length == 0) {
 			throw new IllegalArgumentException("Type must be set!");
 		}
 
-		AlfrescoUtils.updateAspects(session, object, null, type,
+		String objectId = AlfrescoUtils.updateAspects(session, object, null, type,
 				null);
+        if (!object.getId().equals(objectId)) {
+            ret = session.getObject(objectId);
+        }
+        return ret;
 	}
 }
