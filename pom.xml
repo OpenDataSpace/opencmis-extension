@@ -23,6 +23,10 @@
     <version>0.7</version>
     <packaging>jar</packaging>
 
+    <prerequisites>
+        <maven>2.2.1</maven>
+    </prerequisites>
+
     <organization>
         <name>Alfresco</name>
         <url>http://www.alfresco.com/</url>
@@ -107,6 +111,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
                 <configuration>
                     <target>${maven.compile.target}</target>
                     <source>${maven.compile.source}</source>
@@ -143,6 +148,7 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
             <executions>
                 <execution>
                     <id>attach-sources</id>
@@ -155,6 +161,7 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
             <executions>
                 <execution>
                     <id>attach-javadocs</id>
@@ -174,36 +181,6 @@
             <version>0.10.0</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-client-api</artifactId>
-            <version>0.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-client-bindings</artifactId>
-            <version>0.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-commons-impl</artifactId>
-            <version>0.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-commons-api</artifactId>
-            <version>0.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-server-support</artifactId>
-            <version>0.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-server-bindings</artifactId>
-            <version>0.10.0</version>
-        </dependency>
-        <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
@@ -213,10 +190,5 @@
             <artifactId>json-simple</artifactId>
             <version>1.1</version>
         </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit-dep</artifactId>
-            <version>4.11</version>
-        </dependency>    
     </dependencies>
 </project>
