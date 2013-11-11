@@ -177,7 +177,7 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.chemistry.opencmis</groupId>
-            <artifactId>chemistry-opencmis-client-impl</artifactId>
+            <artifactId>chemistry-opencmis-android-client</artifactId>
             <version>0.10.0</version>
         </dependency>
         <dependency>
