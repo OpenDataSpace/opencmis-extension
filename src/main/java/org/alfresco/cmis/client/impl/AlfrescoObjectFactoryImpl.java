@@ -29,6 +29,7 @@ import javax.xml.datatype.DatatypeFactory;
 
 import org.alfresco.cmis.client.type.AlfrescoDocumentType;
 import org.alfresco.cmis.client.type.AlfrescoFolderType;
+import org.alfresco.cmis.client.type.AlfrescoItemType;
 import org.alfresco.cmis.client.type.AlfrescoPolicyType;
 import org.alfresco.cmis.client.type.AlfrescoRelationshipType;
 import org.alfresco.cmis.client.type.AlfrescoSecondaryType;
@@ -38,6 +39,7 @@ import org.apache.chemistry.opencmis.client.api.OperationContext;
 import org.apache.chemistry.opencmis.client.api.Property;
 import org.apache.chemistry.opencmis.client.api.SecondaryType;
 import org.apache.chemistry.opencmis.client.api.Session;
+import org.apache.chemistry.opencmis.client.runtime.ItemImpl;
 import org.apache.chemistry.opencmis.client.runtime.PolicyImpl;
 import org.apache.chemistry.opencmis.client.runtime.RelationshipImpl;
 import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
@@ -48,6 +50,7 @@ import org.apache.chemistry.opencmis.commons.data.ObjectData;
 import org.apache.chemistry.opencmis.commons.data.Properties;
 import org.apache.chemistry.opencmis.commons.definitions.DocumentTypeDefinition;
 import org.apache.chemistry.opencmis.commons.definitions.FolderTypeDefinition;
+import org.apache.chemistry.opencmis.commons.definitions.ItemTypeDefinition;
 import org.apache.chemistry.opencmis.commons.definitions.PolicyTypeDefinition;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.definitions.RelationshipTypeDefinition;
@@ -85,6 +88,8 @@ public class AlfrescoObjectFactoryImpl extends ObjectFactoryImpl
         	ret = new AlfrescoPolicyType(this.session, (PolicyTypeDefinition) typeDefinition);
         } else if (typeDefinition instanceof SecondaryTypeDefinition) {
         	ret = new AlfrescoSecondaryType(this.session, (SecondaryTypeDefinition) typeDefinition);
+        } else if (typeDefinition instanceof ItemTypeDefinition) {
+        	ret = new AlfrescoItemType(this.session, (ItemTypeDefinition) typeDefinition);
         } else {
             throw new CmisRuntimeException("Unknown base type!");
         }
@@ -350,6 +355,9 @@ public class AlfrescoObjectFactoryImpl extends ObjectFactoryImpl
             return new PolicyImpl((SessionImpl) this.session, type, objectData, context);
         case CMIS_RELATIONSHIP:
             return new RelationshipImpl((SessionImpl) this.session, type, objectData, context);
+        case CMIS_ITEM:
+            return new ItemImpl((SessionImpl) this.session, type, objectData, context);
+
         default:
             throw new CmisRuntimeException("unsupported type: " + objectData.getBaseTypeId());
         }
