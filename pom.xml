@@ -20,7 +20,7 @@
     <groupId>org.alfresco.cmis.client</groupId>
     <artifactId>alfresco-opencmis-extension</artifactId>
     <name>Alfresco OpenCMIS Extension</name>
-    <version>0.7</version>
+    <version>0.8</version>
     <packaging>jar</packaging>
 
     <prerequisites>
