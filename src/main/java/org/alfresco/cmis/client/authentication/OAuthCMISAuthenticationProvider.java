@@ -101,7 +101,6 @@ public class OAuthCMISAuthenticationProvider extends AbstractAuthenticationProvi
      * Authenticates with the Alfresco CMIS Public Api by generating an access token to communicate with the public api.
      * Refresh support is provided.
      * 
-     * @param accessToken
      */
     public OAuthCMISAuthenticationProvider(String clientId, String clientSecret, String redirectUrl, String accessTokenUrl, String refreshTokenUrl, String authCode)
     {

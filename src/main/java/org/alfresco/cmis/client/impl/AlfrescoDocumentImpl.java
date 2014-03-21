@@ -26,7 +26,6 @@ import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.OperationContext;
 import org.apache.chemistry.opencmis.client.api.Policy;
-import org.apache.chemistry.opencmis.client.api.TransientCmisObject;
 import org.apache.chemistry.opencmis.client.runtime.DocumentImpl;
 import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.commons.data.Ace;
@@ -49,14 +48,6 @@ public class AlfrescoDocumentImpl extends DocumentImpl implements
 			ObjectData objectData, OperationContext context) {
 		super.initialize(session, objectType, objectData, context);
 		aspects = new AlfrescoAspectsImpl(session, this);
-	}
-
-	@Override
-	protected TransientCmisObject createTransientCmisObject() {
-		TransientAlfrescoDocumentImpl td = new TransientAlfrescoDocumentImpl();
-		td.initialize(getSession(), this);
-
-		return td;
 	}
 
 	public AlfrescoDocumentType getTypeWithAspects() {
