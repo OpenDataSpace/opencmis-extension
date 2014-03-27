@@ -502,7 +502,8 @@ public class AlfrescoUtils
     	{
     	    for(CmisExtensionElement elem : extensions)
     	    {
-    	        if(elem.getNamespace().equals(namespace) && elem.getName().equals(name))
+    	    	/* MNT-10430 : browser binding does not deliver any namespace */
+    	    	if((elem.getNamespace() == null || elem.getNamespace().equals(namespace)) && elem.getName().equals(name))
     	        {
     	            ret = elem;
     	        }
