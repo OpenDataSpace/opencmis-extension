@@ -23,7 +23,6 @@ import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.ObjectId;
 import org.apache.chemistry.opencmis.client.api.ObjectType;
 import org.apache.chemistry.opencmis.client.api.OperationContext;
-import org.apache.chemistry.opencmis.client.api.TransientCmisObject;
 import org.apache.chemistry.opencmis.client.runtime.FolderImpl;
 import org.apache.chemistry.opencmis.client.runtime.SessionImpl;
 import org.apache.chemistry.opencmis.commons.data.ObjectData;
@@ -48,14 +47,6 @@ public class AlfrescoFolderImpl extends FolderImpl implements AlfrescoFolder
         aspects = new AlfrescoAspectsImpl(session, this);
     }
 
-    @Override
-    protected TransientCmisObject createTransientCmisObject()
-    {
-        TransientAlfrescoFolderImpl td = new TransientAlfrescoFolderImpl();
-        td.initialize(getSession(), this);
-
-        return td;
-    }
 
     public ObjectType getTypeWithAspects()
     {
