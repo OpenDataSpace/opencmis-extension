@@ -47,6 +47,7 @@ public class AlfrescoFolderImpl extends FolderImpl implements AlfrescoFolder
         aspects = new AlfrescoAspectsImpl(session, this);
     }
 
+
     public ObjectType getTypeWithAspects()
     {
         readLock();
