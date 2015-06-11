@@ -111,7 +111,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>3.3</version>
                 <configuration>
                     <target>${maven.compile.target}</target>
                     <source>${maven.compile.source}</source>
@@ -148,7 +148,7 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>2.3</version>
+            <version>2.4</version>
             <executions>
                 <execution>
                     <id>attach-sources</id>
@@ -161,7 +161,7 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
+            <version>2.10.3</version>
             <executions>
                 <execution>
                     <id>attach-javadocs</id>
@@ -170,6 +170,9 @@
                     </goals>
                 </execution>
             </executions>
+            <configuration>
+                <additionalparam>-Xdoclint:none</additionalparam>
+            </configuration>
         </plugin>
         </plugins>
     </build>
